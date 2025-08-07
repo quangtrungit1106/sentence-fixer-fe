@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Tùy chỉnh bổ sung nếu cần */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
