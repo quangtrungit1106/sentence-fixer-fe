@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import Navbar from "../components/Navbar";
-import { useNavigate } from "react-router-dom";
 import type { QuestionData } from "../types/question";
 import {
   fetchRandomQuestion,
@@ -13,27 +12,23 @@ import {
 } from "../api/userAnswerApi";
 
 const Dashboard: React.FC = () => {
-  const navigate = useNavigate();
-  const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-
-  // State quản lý câu hỏi và đáp án
   const [currentQuestion, setCurrentQuestion] = useState<QuestionData | null>(null);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [isAnswered, setIsAnswered] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [translate, setTranslate] = useState(false);
   const [newQuestion, setNewQuestion] = useState<QuestionData | null>(null);
+  const [isFinished, setIsFinished] = useState(false); // ✅ thêm state
 
-  // Thống kê câu hỏi
   const [correctCount, setCorrectCount] = useState(0);
   const [questionCount, setQuestionCount] = useState(0);
   const [totalquestionCount, setTotalQuestionCount] = useState(0);
   const token = localStorage.getItem("accessToken") || "";
 
-  // Load câu hỏi random
   const loadRandomQuestion = async () => {
+    setCurrentQuestion(null);
     try {
       const question = await fetchRandomQuestion(token);
       setCurrentQuestion(question);
@@ -42,13 +37,15 @@ const Dashboard: React.FC = () => {
       setIsCorrect(false);
       setTranslate(false);
       setNewQuestion(null);
+      setIsFinished(false);
     } catch (error) {
       console.error("Failed to load question", error);
-      // Xử lý logout hoặc báo lỗi nếu cần
+      if (questionCount >= totalquestionCount) {
+        setIsFinished(true); 
+      }
     }
   };
 
-  // Load thống kê số câu đã làm & đúng
   const loadStats = async () => {
     try {
       const data = await getDoneQuestionCount(token);
@@ -66,7 +63,6 @@ const Dashboard: React.FC = () => {
     loadStats();
   }, []);
 
-  // Xác nhận đáp án
   const handleConfirm = async () => {
     if (selectedOption === null || !currentQuestion) return;
     try {
@@ -74,23 +70,20 @@ const Dashboard: React.FC = () => {
       const correct = await submitAnswer(token, currentQuestion.id, selectedAnswerId);
       setIsCorrect(correct);
       setIsAnswered(true);
-      
       await loadStats();
     } catch (error) {
       console.error("Failed to submit answer", error);
     }
   };
 
-  // Câu hỏi tiếp theo
   const handleNext = async () => {
     await loadRandomQuestion();
     await loadStats();
   };
 
-  // Dịch câu hỏi
   const handleTranslate = async () => {
     if (!currentQuestion) return;
-    if(translate === false || newQuestion === null) {
+    if (translate === false || newQuestion === null) {
       try {
         const translatedQuestion = await translateQuestion(token, currentQuestion);
         setNewQuestion(currentQuestion);
@@ -99,45 +92,27 @@ const Dashboard: React.FC = () => {
       } catch (error) {
         console.error("Failed to translate question", error);
       }
-    }else{
+    } else {
       const temp = newQuestion;
       setNewQuestion(currentQuestion);
       setCurrentQuestion(temp);
     }
   };
 
-  const handleLogout = async () => {
-    await new Promise((resolve) => {
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-      resolve(null);
-    });
-    window.location.href = "/dashboard";
-  };
-
-  const handleProfile = () => {
-    navigate("/profile");
-  };
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setMenuOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+ 
 
   return (
     <div className="min-h-screen bg-gray-100">
       <Navbar />
 
-      {/* Content */}
       <main className="max-w-5xl mx-auto p-6 flex min-h-[80vh]">
         {/* 2/3 Questions */}
         <div className="w-full md:w-2/3 bg-white rounded-lg shadow-md p-6 mr-4">
-          {currentQuestion ? (
+          {isFinished ? (
+            <div className="text-center text-xl font-semibold text-green-600">
+              🎉 Bạn đã hoàn thành toàn bộ câu hỏi!
+            </div>
+          ) : currentQuestion ? (
             <>
               <h2 className="text-xl font-bold mb-4">
                 Câu hỏi: {currentQuestion.content}
@@ -208,7 +183,6 @@ const Dashboard: React.FC = () => {
             <li>
               📌 Số câu đã làm: <strong>{questionCount}</strong>
             </li>
-            {/* Tổng số câu bạn có thể lấy từ backend nếu có API tương ứng */}
             <li>
               🧾 Tổng số câu: <strong>{totalquestionCount}</strong>
             </li>

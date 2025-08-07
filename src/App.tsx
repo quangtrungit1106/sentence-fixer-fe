@@ -5,6 +5,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import RequireAuth from './components/RequireAuth'; // đúng path của bạn nhé
 import MyProfile from './pages/MyProfile';
+import History from './pages/History';
 
 const App: React.FC = () => {
   const token = localStorage.getItem('accessToken');
@@ -20,6 +21,7 @@ const App: React.FC = () => {
         />
         <Route path="/register" element={<Register />} />
         <Route path="/profile" element={<MyProfile />} /> 
+        <Route path="/history" element={<History />} />
         <Route
           path="/dashboard"
           element={

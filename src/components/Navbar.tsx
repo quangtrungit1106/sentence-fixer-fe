@@ -16,6 +16,10 @@ const Navbar: React.FC = () => {
     navigate("/profile");
   };
 
+  const handleHistory = () => {
+    navigate("/history");
+  };
+
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
@@ -48,6 +52,12 @@ const Navbar: React.FC = () => {
               className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
               My Profile
+            </button>
+            <button
+              onClick={handleHistory}
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            >
+              Lịch sử làm bài
             </button>
             <button
               onClick={handleLogout}

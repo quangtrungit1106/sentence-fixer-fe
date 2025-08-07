@@ -1,6 +1,7 @@
 import type {
   DoneQuestionCountResponse,
   SubmitAnswerResponse,
+  UserAnswerHistoryItem,
 } from "../types/userAnswer";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/";
@@ -73,5 +74,27 @@ export async function getSuccessQuestionCount(
   if (data.statusCode !== 200) {
     throw new Error("Get success question count failed");
   }
+  return data.data;
+}
+
+// Lấy lịch sử làm bài của người dùng
+export async function getUserAnswerHistory(
+  token: string
+): Promise<UserAnswerHistoryItem[]> {
+  const response = await fetch(`${API_BASE}user-answers/history`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch user answer history");
+  }
+
+  const data = await response.json();
+  if (data.statusCode !== 200) {
+    throw new Error("Get user answer history failed");
+  }
+
   return data.data;
 }
