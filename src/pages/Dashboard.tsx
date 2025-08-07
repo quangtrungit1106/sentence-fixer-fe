@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import Navbar from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
 import type { QuestionData } from "../types/question";
 import {
@@ -10,7 +11,6 @@ import {
   getDoneQuestionCount,
   getSuccessQuestionCount,
 } from "../api/userAnswerApi";
-import { set } from "react-hook-form";
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -131,34 +131,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Navbar */}
-      <header className="bg-white shadow-md p-4 flex justify-between items-center">
-        <h1 className="text-xl font-bold text-gray-800">MyApp Dashboard</h1>
-        <div className="relative" ref={menuRef}>
-          <img
-            src="https://i.pravatar.cc/40"
-            alt="Avatar"
-            className="w-10 h-10 rounded-full cursor-pointer"
-            onClick={() => setMenuOpen(!menuOpen)}
-          />
-          {menuOpen && (
-            <div className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg border z-10">
-              <button
-                onClick={handleProfile}
-                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              >
-                My Profile
-              </button>
-              <button
-                onClick={handleLogout}
-                className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-              >
-                Logout
-              </button>
-            </div>
-          )}
-        </div>
-      </header>
+      <Navbar />
 
       {/* Content */}
       <main className="max-w-5xl mx-auto p-6 flex min-h-[80vh]">
