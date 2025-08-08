@@ -12,7 +12,6 @@ import {
 } from "../api/userAnswerApi";
 
 const Dashboard: React.FC = () => {
-  const menuRef = useRef<HTMLDivElement>(null);
 
   const [currentQuestion, setCurrentQuestion] = useState<QuestionData | null>(null);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
